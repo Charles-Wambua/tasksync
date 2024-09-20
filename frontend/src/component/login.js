@@ -2,6 +2,8 @@ import React from 'react';
 import { Breadcrumb, Layout, Button, Checkbox, Form, Input, message, theme } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios'; 
+// This React component renders a login form handling user authentication by sending login credentials to a server via Axios, storing the received token in local storage upon successful login, providing feedback messages for success or failure, and navigating back to the home page while maintaining a structured layout with breadcrumb navigation and a footer.
+
 
 const { Content, Footer } = Layout;
 

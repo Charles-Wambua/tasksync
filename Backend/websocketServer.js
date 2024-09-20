@@ -1,5 +1,7 @@
 const http = require('http');
 const WebSocket = require('ws');
+// This Node.js server sets up an Express application with an integrated WebSocket server, handling client connections and messages, broadcasting updates to all connected clients, and logging connection events, while listening on port 4001 for incoming WebSocket connections.
+ 
 
 let wss;
 

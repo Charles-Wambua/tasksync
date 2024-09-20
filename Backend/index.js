@@ -4,6 +4,8 @@ const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const crudRoutes = require('./routes/crudRoutes');
 const { initWebSocketServer } = require('./websocketServer'); 
+// This code sets up an Express server with CORS support and JSON body parsing. It initializes WebSocket functionality and registers routes for user management and CRUD operations. The server listens on a specified port, and upon successful startup, it logs a message indicating the server is running and connected to PostgreSQL.
+
 require('dotenv').config();
 
 const port = process.env.PORT || 4000;

@@ -1,74 +1,162 @@
-import React, { useState } from 'react';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import { v4 as uuidv4 } from 'uuid'; 
-function Form() {
-    const [formValues, setFormValues] = useState({
-        id: '',
-        firstName: '',
-        lastName: '',
-        description: ''
-    });
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormValues({
-            ...formValues,
-            [name]: value
-        });
-    };
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const newRecord = {
-            ...formValues,
-            id: uuidv4()
-        };
-        console.log('Form Submitted:', newRecord);
-        setFormValues({
-            id: '',
-            firstName: '',
-            lastName: '',
-            description: ''
-        });
+import React, { useEffect, useState } from 'react';
+import { Layout, Breadcrumb, Form, Input, Button, Space, notification, theme } from 'antd';
+import { useNavigate } from 'react-router-dom';
+
+// This React component implements a user form, establishes a WebSocket connection to listen for new record notifications, handles form submission to send user data to a server, resets the form fields, and displays success or error notifications based on the submission outcome, all while maintaining a responsive layout with a breadcrumb navigation and footer.
+
+
+const { Content, Footer } = Layout;
+
+const UserForm = () => {
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
+  const [socket, setSocket] = useState(null);
+
+  const {
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken();
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:4000');
+    setSocket(ws);
+
+    ws.onopen = () => {
+      console.log('WebSocket connection established');
     };
 
-    return (
-        <div>
-            <Box
-                component="form"
-                sx={{ '& > :not(style)': { m: 1, width: '25ch' } }}
-                noValidate
-                autoComplete="off"
-                onSubmit={handleSubmit}
+    ws.onmessage = (event) => {
+      const update = JSON.parse(event.data);
+      if (update.type === 'NEW_RECORD') {
+        notification.info({
+          message: 'New Record',
+          description: `A new record has been added: ${update.payload.first_name} ${update.payload.last_name}`,
+        });
+      }
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+    return () => {
+      ws.close();
+    };
+  }, []);
+
+  const onFinish = async (values) => {
+    try {
+      const response = await fetch('http://localhost:4000/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        form.resetFields();
+        navigate("/records");
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({
+            type: 'NEW_RECORD',
+            payload: result,
+          }));
+        }
+      } else {
+        throw new Error(result.message || 'Error sending information');
+      }
+    } catch (error) {
+      notification.error({
+        message: 'Error',
+        description: error.message,
+      });
+    }
+  };
+
+  const onReset = () => {
+    form.resetFields();
+  };
+
+  return (
+    <Layout>
+      <Content
+        style={{
+          padding: '0 16px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 'calc(100vh - 128px)',
+          marginTop: '64px',
+        }}
+      >
+        <div
+          style={{
+            padding: 24,
+            width: '100%',
+            maxWidth: 600,
+            background: colorBgContainer,
+            borderRadius: borderRadiusLG,
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <Breadcrumb
+            style={{
+              margin: '16px 0',
+              textAlign: 'center',
+            }}
+          >
+            <Breadcrumb.Item>Home</Breadcrumb.Item>
+            <Breadcrumb.Item>User Form</Breadcrumb.Item>
+          </Breadcrumb>
+          <Form
+            name="user-form"
+            form={form}
+            onFinish={onFinish}
+            style={{ maxWidth: '100%' }}
+            layout="vertical"
+          >
+            <Form.Item
+              name="firstName"
+              label="First Name"
+              rules={[{ required: true, message: 'Please input your first name!' }]}
             >
-                <TextField
-                    id="firstName"
-                    name="firstName"
-                    label="First Name"
-                    variant="outlined"
-                    value={formValues.firstName}
-                    onChange={handleChange}
-                />
-                <TextField
-                    id="lastName"
-                    name="lastName"
-                    label="Last Name"
-                    variant="outlined"
-                    value={formValues.lastName}
-                    onChange={handleChange}
-                />
-                <TextField
-                    id="description"
-                    name="description"
-                    label="Description"
-                    variant="outlined"
-                    value={formValues.description}
-                    onChange={handleChange}
-                />
-                <Button type="submit" variant="contained">Submit</Button>
-            </Box>
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="lastName"
+              label="Last Name"
+              rules={[{ required: true, message: 'Please input your last name!' }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="description"
+              label="Description"
+              rules={[{ required: true, message: 'Please input a description!' }]}
+            >
+              <Input.TextArea rows={4} />
+            </Form.Item>
+            <Form.Item>
+              <Space style={{ width: '100%', justifyContent: 'center' }}>
+                <Button type="primary" htmlType="submit">
+                  Submit
+                </Button>
+                <Button htmlType="button" onClick={onReset}>
+                  Reset
+                </Button>
+              </Space>
+            </Form.Item>
+          </Form>
         </div>
-    );
-}
+      </Content>
+      <Footer
+        style={{
+          textAlign: 'center',
+        }}
+      >
+        ©{new Date().getFullYear()} by Charles
+      </Footer>
+    </Layout>
+  );
+};
 
-export default Form;
+export default UserForm;

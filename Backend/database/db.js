@@ -2,6 +2,9 @@ const { Pool } = require('pg');
 require('dotenv').config();
 const { broadcast } = require('../websocketServer');
 
+// This Node.js module establishes a connection to a PostgreSQL database using the `pg` library, sets up a listener for notifications on the `data_update` channel, and broadcasts any received notifications through a WebSocket server, sending updates to all connected clients while ensuring proper client management.
+
+
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,

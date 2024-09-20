@@ -1,10 +1,13 @@
 const express = require('express');
-const pool = require('../database/db'); // Assuming db.js is your PostgreSQL connection
+const pool = require('../database/db');
 const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
 const WebSocket = require('ws');
 const { getWebSocketServer } = require('../websocketServer');
 const { broadcast } = require('../websocketServer');
+
+// This Express router module handles user and record management in a PostgreSQL database, providing routes for creating, reading, updating, and deleting records. It utilizes UUIDs for unique record identifiers and broadcasts updates via a WebSocket server to notify all connected clients of changes in real-time. Each route properly manages error handling and response statuses to ensure smooth interaction with the API.
+
 
 // Function to broadcast a message to all connected WebSocket clients
 // const broadcast = (message) => {

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Space, Spin, Alert, Modal, Form, Input, notification } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import axios from 'axios';
+// This React component displays a table of records, managing data fetching, editing, and deleting operations with Axios; it utilizes WebSockets to listen for real-time updates, updating the state and notifying users when records are added, modified, or deleted, while incorporating a modal for editing record details and providing loading and error handling states.
+
 
 const RecordsTable = () => {
   const [data, setData] = useState([]);

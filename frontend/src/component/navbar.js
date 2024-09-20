@@ -2,6 +2,8 @@ import React from 'react';
 import { Layout, Dropdown, Menu } from 'antd';
 import { MenuOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
+// This React component creates a navigation bar, featuring a dropdown menu for navigation links and a logout option; it handles user logout by removing the token from local storage, navigating to the login page, and refreshing the application, while maintaining a fixed header layout that displays the application title.
+
 
 const { Header } = Layout;
 

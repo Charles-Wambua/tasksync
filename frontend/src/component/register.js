@@ -2,6 +2,8 @@ import React from 'react';
 import { Breadcrumb, Layout, Button, Form, Input, message, theme } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+// This React component implements a registration form, handling user input to register a new account via an Axios POST request, providing feedback messages for success or failure, and navigating to the login page upon successful registration while maintaining a structured layout with breadcrumb navigation and a footer.
+
 
 const { Content, Footer } = Layout;
 
