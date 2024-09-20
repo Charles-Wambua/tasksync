@@ -23,7 +23,6 @@ const RecordsTable = () => {
     ws.onmessage = (event) => {
       try {
         const update = JSON.parse(event.data);
-        console.log('Received update:', update);
         handleWebSocketUpdate(update);
       } catch (error) {
         console.error('Error parsing WebSocket message:', error);
@@ -31,12 +30,7 @@ const RecordsTable = () => {
     };
 
     ws.onclose = (event) => {
-      if (event.wasClean) {
-        console.log('WebSocket connection closed cleanly');
-      } else {
-        console.log('WebSocket connection closed unexpectedly');
-      }
-      console.log(`Code: ${event.code}, Reason: ${event.reason}`);
+      console.log(event.wasClean ? 'WebSocket connection closed cleanly' : 'WebSocket connection closed unexpectedly');
     };
 
     ws.onerror = (error) => {
@@ -46,7 +40,6 @@ const RecordsTable = () => {
       if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
         ws.close();
       }
-      console.log('WebSocket connection cleaned up');
     };
   }, []);
 
@@ -82,7 +75,7 @@ const RecordsTable = () => {
         );
         notification.success({
           message: 'Record Updated',
-          description: `Record with ID ${update.payload.id} has been updated: ${update.payload.first_name} ${update.payload.last_name}`,
+          description: `Record with ID ${update.payload.id} has been updated.`,
         });
         break;
       case 'DELETE_RECORD':
@@ -98,7 +91,6 @@ const RecordsTable = () => {
         console.warn('Unknown update type:', update.type);
     }
   };
-  
 
   const handleEdit = (record) => {
     setEditingRecord(record);
@@ -113,10 +105,7 @@ const RecordsTable = () => {
         socket.send(JSON.stringify({ type: 'DELETE_RECORD', payload: { id } }));
       }
     } catch (error) {
-      notification.error({
-        message: 'Error',
-        description: 'Error deleting record',
-      });
+      notification.error({ message: 'Error', description: 'Error deleting record' });
     }
   };
 
@@ -131,10 +120,7 @@ const RecordsTable = () => {
       setIsModalVisible(false);
       setEditingRecord(null);
     } catch (error) {
-      notification.error({
-        message: 'Error',
-        description: 'Error updating record',
-      });
+      notification.error({ message: 'Error', description: 'Error updating record' });
     }
   };
 
@@ -144,26 +130,10 @@ const RecordsTable = () => {
   };
 
   const columns = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
-      title: 'First Name',
-      dataIndex: 'first_name',
-      key: 'first_name',
-    },
-    {
-      title: 'Last Name',
-      dataIndex: 'last_name',
-      key: 'last_name',
-    },
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
-    },
+    { title: 'ID', dataIndex: 'id', key: 'id' },
+    { title: 'First Name', dataIndex: 'first_name', key: 'first_name' },
+    { title: 'Last Name', dataIndex: 'last_name', key: 'last_name' },
+    { title: 'Description', dataIndex: 'description', key: 'description' },
     {
       title: 'Actions',
       key: 'actions',
@@ -176,12 +146,18 @@ const RecordsTable = () => {
     },
   ];
 
-  if (loading) return <Spin size="large" />;
+  if (loading) return <Spin size="large" style={{ display: 'block', margin: 'auto' }} />;
   if (error) return <Alert message={error} type="error" />;
 
   return (
     <>
-      <Table dataSource={data} columns={columns} rowKey="id" />
+      <Table
+        dataSource={data}
+        columns={columns}
+        rowKey="id"
+        pagination={{ pageSize: 10 }}
+        scroll={{ x: true }}
+      />
 
       <Modal
         title="Edit Record"

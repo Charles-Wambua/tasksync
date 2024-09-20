@@ -3,7 +3,7 @@ import { Breadcrumb, Layout, Button, Form, Input, message, theme } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 
 const Register = () => {
   const navigate = useNavigate();
@@ -22,28 +22,14 @@ const Register = () => {
   };
 
   const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
     message.error('Registration failed. Please check your input.');
   };
 
   return (
     <Layout>
-      <Header
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <div className="demo-logo" />
-      </Header>
       <Content
         style={{
-          padding: '0 48px',
+          padding: '0 16px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -52,8 +38,9 @@ const Register = () => {
       >
         <div
           style={{
-            padding: 24,
-            width: 400,
+            padding: '24px',
+            width: '100%',
+            maxWidth: '400px',
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
@@ -70,8 +57,7 @@ const Register = () => {
           </Breadcrumb>
           <Form
             name="register"
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
+            layout="vertical"
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             autoComplete="off"
@@ -91,13 +77,17 @@ const Register = () => {
             >
               <Input.Password />
             </Form.Item>
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit">
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit" block>
                 Register
               </Button>
             </Form.Item>
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <span>Already registered? <Link to="/login">Sign In here</Link></span>
+
+            <Form.Item>
+              <span>
+                Already registered? <Link to="/login">Sign In here</Link>
+              </span>
             </Form.Item>
           </Form>
         </div>

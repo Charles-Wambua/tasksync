@@ -36,10 +36,16 @@ const NavBar = () => {
       <Header
         className="site-layout-background"
         style={{
+          position: 'fixed',
+          top: 0,
+          zIndex: 1,
+          width: '100%',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '0 16px',
+          boxSizing: 'border-box',
+          backgroundColor: '#001529', // Ensure background covers content underneath
         }}
       >
         <div style={{ color: '#fff', fontSize: '24px' }}>

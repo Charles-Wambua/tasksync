@@ -24,7 +24,6 @@ const UserForm = () => {
     ws.onmessage = (event) => {
       const update = JSON.parse(event.data);
       if (update.type === 'NEW_RECORD') {
-        console.log('New record received:', update.payload);
         notification.info({
           message: 'New Record',
           description: `A new record has been added: ${update.payload.first_name} ${update.payload.last_name}`,
@@ -78,7 +77,7 @@ const UserForm = () => {
     <Layout>
       <Content
         style={{
-          padding: '0 48px',
+          padding: '0 16px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -88,7 +87,8 @@ const UserForm = () => {
         <div
           style={{
             padding: 24,
-            width: 600, 
+            width: '100%',
+            maxWidth: 600,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', 
@@ -108,6 +108,7 @@ const UserForm = () => {
             form={form}
             onFinish={onFinish}
             style={{ maxWidth: '100%' }}
+            layout="vertical"
           >
             <Form.Item
               name="firstName"
