@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Space, Spin, Alert, Modal, Form, Input, notification } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import axios from 'axios';
-// This React component displays a table of records, managing data fetching, editing, and deleting operations with Axios; it utilizes WebSockets to listen for real-time updates, updating the state and notifying users when records are added, modified, or deleted, while incorporating a modal for editing record details and providing loading and error handling states.
-
 
 const RecordsTable = () => {
   const [data, setData] = useState([]);
@@ -15,7 +13,7 @@ const RecordsTable = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:4000'); 
+    const ws = new WebSocket('ws://localhost:4000');
     setSocket(ws);
 
     ws.onopen = () => {
@@ -25,6 +23,7 @@ const RecordsTable = () => {
     ws.onmessage = (event) => {
       try {
         const update = JSON.parse(event.data);
+        console.log("data", update)
         handleWebSocketUpdate(update);
       } catch (error) {
         console.error('Error parsing WebSocket message:', error);
@@ -38,6 +37,7 @@ const RecordsTable = () => {
     ws.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
+
     return () => {
       if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
         ws.close();
@@ -61,9 +61,14 @@ const RecordsTable = () => {
   }, []);
 
   const handleWebSocketUpdate = (update) => {
+    console.log('Received WebSocket update:', update);
     switch (update.type) {
       case 'NEW_RECORD':
-        setData((prevData) => [...prevData, update.payload]);
+        setData((prevData) => {
+          const newData = [...prevData, update.payload];
+          console.log('Updated data after insertion:', newData);
+          return newData.sort((a, b) => a.id.localeCompare(b.id));
+        });
         notification.info({
           message: 'New Record Added',
           description: `A new record has been added: ${update.payload.first_name} ${update.payload.last_name}`,
@@ -81,18 +86,19 @@ const RecordsTable = () => {
         });
         break;
       case 'DELETE_RECORD':
-        setData((prevData) =>
-          prevData.filter((item) => item.id !== update.payload.id)
-        );
+        setData((prevData) => prevData.filter((item) => item.id !== update.payload.id));
         notification.success({
           message: 'Record Deleted',
-          description: `Record with ID ${update.payload.id} has been successfully deleted.`,
+          description: `Record with ID ${update.payload.id} has been deleted.`,
         });
         break;
       default:
         console.warn('Unknown update type:', update.type);
     }
   };
+  
+  
+  
 
   const handleEdit = (record) => {
     setEditingRecord(record);
@@ -118,7 +124,6 @@ const RecordsTable = () => {
       if (socket) {
         socket.send(JSON.stringify({ type: 'UPDATE_RECORD', payload: { id: editingRecord.id, ...values } }));
       }
-      setData(data.map((item) => (item.id === editingRecord.id ? { ...item, ...values } : item)));
       setIsModalVisible(false);
       setEditingRecord(null);
     } catch (error) {
@@ -159,9 +164,8 @@ const RecordsTable = () => {
         columns={columns}
         rowKey="id"
         pagination={{ pageSize: 10 }}
-        scroll={{ x: true }} 
+        scroll={{ x: true }}
       />
-
       <Modal
         title="Edit Record"
         visible={isModalVisible}
