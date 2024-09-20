@@ -151,12 +151,13 @@ const RecordsTable = () => {
 
   return (
     <>
+      <h2 style={{ textAlign: 'center' }}>Records</h2>
       <Table
         dataSource={data}
         columns={columns}
         rowKey="id"
         pagination={{ pageSize: 10 }}
-        scroll={{ x: true }}
+        scroll={{ x: true }} 
       />
 
       <Modal
