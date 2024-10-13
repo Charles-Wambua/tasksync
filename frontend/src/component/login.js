@@ -1,14 +1,14 @@
 import React from 'react';
 import { Breadcrumb, Layout, Button, Checkbox, Form, Input, message, theme } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios'; 
-// This React component renders a login form handling user authentication by sending login credentials to a server via Axios, storing the received token in local storage upon successful login, providing feedback messages for success or failure, and navigating back to the home page while maintaining a structured layout with breadcrumb navigation and a footer.
-
+import axios from 'axios';
+import useAuth from '../hooks/useAuth'; // Import the useAuth hook
 
 const { Content, Footer } = Layout;
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth(); // Use the login function from the Auth context
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -16,11 +16,13 @@ const Login = () => {
   const onFinish = async (values) => {
     try {
       const response = await axios.post('http://localhost:4000/user/login', values);
-      const { token } = response.data;
-      localStorage.setItem('token', token);
+      const { token, refreshToken } = response.data; 
+      const userData = { username: values.username }; 
+
+      login(userData, token, refreshToken);
+
       message.success('Login successful');
-      navigate('/');
-      window.location.reload();
+      navigate('/userform');
     } catch (error) {
       message.error('Login failed. Please check your credentials.');
     }

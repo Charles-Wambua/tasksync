@@ -2,22 +2,28 @@ import React from 'react';
 import { Breadcrumb, Layout, Button, Form, Input, message, theme } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-// This React component implements a registration form, handling user input to register a new account via an Axios POST request, providing feedback messages for success or failure, and navigating to the login page upon successful registration while maintaining a structured layout with breadcrumb navigation and a footer.
-
+import  useAuth  from '../hooks/useAuth';
 
 const { Content, Footer } = Layout;
 
 const Register = () => {
   const navigate = useNavigate();
+  const { login } = useAuth(); // Use the login function from the Auth context
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
   const onFinish = async (values) => {
     try {
-      await axios.post('http://localhost:4000/user/register', values);
+      const response = await axios.post('http://localhost:4000/user/register', values);
+      const { token } = response.data; // Get the token from the response
+
+      // Automatically log in the user after successful registration
+      // Assuming you don't have user data here, set it to null or provide a default object
+      login({ username: values.username }, token);
+
       message.success('Registration successful');
-      navigate('/login');
+      navigate('/'); // Navigate to home or another page after registration
     } catch (error) {
       message.error('Registration failed. Please try again.');
     }
